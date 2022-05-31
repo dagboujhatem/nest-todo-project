@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -8,27 +8,32 @@ export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
   @Post()
-  create(@Body() createTodoDto: CreateTodoDto) {
-    return this.todoService.create(createTodoDto);
+  async create(@Body() createTodoDto: CreateTodoDto, @Res() response) {
+    const createdTodo = await this.todoService.create(createTodoDto);
+    return response.status(HttpStatus.CREATED).json(createdTodo);
   }
 
   @Get()
-  findAll() {
-    return this.todoService.findAll();
+  async findAll(@Res() response) {
+    const allTodos = await this.todoService.findAll();
+    return response.status(HttpStatus.OK).json(allTodos);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.todoService.findOne(+id);
+  async findOne(@Param('id') id: string, @Res() response) {
+    const todo = await this.todoService.findOne(id);
+    return response.status(HttpStatus.OK).json(todo);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todoService.update(+id, updateTodoDto);
+  async update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto, @Res() response) {
+    const updatedTodo = await this.todoService.update(id, updateTodoDto);
+    return response.status(HttpStatus.OK).json(updatedTodo);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.todoService.remove(+id);
+  async remove(@Param('id') id: string, @Res() response) {
+    const deletedTodo = await this.todoService.remove(id);
+    return response.status(HttpStatus.OK).json(deletedTodo);
   }
 }
